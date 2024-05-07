@@ -1,29 +1,17 @@
 #!/bin/bash
 
-# Create a region file by scanning linode API for all available regions
+# Start the region.tfvars file
+echo -n "regions = [" >> region.tfvars
 
-linode-cli  regions list --format 'id' --text --no-headers > input.txt
+# Using the Linode API, extract region codes and start populating
+# them into the region.tfvars file.
+for i in `linode-cli regions list --format 'id' --text --no-headers`
+do
+    echo -n "\"$i\"," >> region.tfvars
+done
 
-#
-
-
-# Read the words from the input file into an array
-words=()
-while IFS= read -r line; do
-    # Remove leading and trailing whitespaces
-    word=$(echo "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-    # Add the word to the array
-    words+=("$word")
-done < input.txt
-					
-# Join the words with quotes and commas
-formatted=$(printf "\"%s\"," "${words[@]}")
-
-# Remove the trailing comma
-formatted=${formatted%,}
-
-# Print the array
-echo "regions = [$formatted]" > region.tfvars
+# Close off the regions array and remove trailing comma
+sed -i '' 's/,$/]/' region.tfvars
 
 # Run Terraform 
 
