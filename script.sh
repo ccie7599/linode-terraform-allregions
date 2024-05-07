@@ -6,6 +6,8 @@ echo -n "regions = [" >> region.tfvars
 # Using the Linode API, extract region codes and start populating
 # them into the region.tfvars file.
 for i in `linode-cli regions list --format 'id' --text --no-headers`
+# Two ensure you're only using the newer regions, use this line instead:
+# for i in `linode-cli regions list --format 'id' --text --no-headers | egrep '[a-z]{2}-[a-z]{3}$'`
 do
     echo -n "\"$i\"," >> region.tfvars
 done
